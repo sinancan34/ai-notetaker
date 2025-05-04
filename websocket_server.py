@@ -15,8 +15,11 @@ async def handle_connection(websocket):
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     tab_id = str(info.get("tabId", "tab"))
 
-    filename_base = f"{tab_id}_{timestamp}"
-    base_output_path = os.path.join(RECORDINGS_DIR, f"{filename_base}_%03d.wav")
+    tab_dir = os.path.join(RECORDINGS_DIR, tab_id)
+    os.makedirs(tab_dir, exist_ok=True)
+
+    filename_base = f"{timestamp}"
+    base_output_path = os.path.join(tab_dir, f"{filename_base}_%03d.wav")
 
     ffmpeg = subprocess.Popen([
         'ffmpeg',
