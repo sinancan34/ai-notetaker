@@ -41,17 +41,22 @@ chrome.action.onClicked.addListener(async (tab) => {
     return;
   }
 
-  // Get a MediaStream for the active tab.
-  const streamId = await chrome.tabCapture.getMediaStreamId({
-    targetTabId: tab.id
-  });
+  setTimeout(async () => {
+    // Get a MediaStream for the active tab.
+    const streamId = await chrome.tabCapture.getMediaStreamId({
+      targetTabId: tab.id
+    });
 
-  // Send the stream ID to the offscreen document to start recording.
-  chrome.runtime.sendMessage({
-    type: 'start-recording',
-    target: 'offscreen',
-    data: streamId
-  });
+    // Send the stream ID to the offscreen document to start recording.
+    chrome.runtime.sendMessage({
+      type: 'start-recording',
+      target: 'offscreen',
+      data: {
+        streamId: streamId,
+        tabId: tab.id
+      }
+    });
 
-  chrome.action.setIcon({ path: '/icons/recording.png' });
+    chrome.action.setIcon({ path: '/icons/recording.png' });
+  }, 250);
 });

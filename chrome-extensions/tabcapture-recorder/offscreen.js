@@ -29,12 +29,20 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
 let recorder;
 let data = [];
-let socket = new WebSocket("ws://localhost:8080");
+let socket;
 
-async function startRecording(streamId) {
+async function startRecording(params) {
   if (recorder?.state === 'recording') {
     throw new Error('Called startRecording while recording is in progress.');
   }
+
+  const { streamId, tabId } = params;
+  
+  socket = new WebSocket("ws://localhost:8080");
+
+  socket.addEventListener("open", () => {
+    socket.send(JSON.stringify({ type: "info", tabId }));
+  });
 
   const media = await navigator.mediaDevices.getUserMedia({
     audio: {
@@ -79,7 +87,7 @@ async function startRecording(streamId) {
     data = [];
     socket?.close();
   };
-  recorder.start();
+  recorder.start(5_000);
 
   // Record the current state in the URL. This provides a very low-bandwidth
   // way of communicating with the service worker (the service worker can check
